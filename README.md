@@ -67,66 +67,9 @@ void loop() {
         right();
         break;
       }
-      case 'G': {
-        forwardleft();
-        break;
-      }
-      case 'I': {
-        forwardright();
-        break;
-      }
-      case 'H': {
-        backleft();
-        break;
-      }
-      case 'J': {
-        backright();
-        break;
-      }
-      case '0': {
-        Speed = 100;
-        break;
-      }
-      case '1': {
-        Speed = 140;
-        break;
-      }
-      case '2': {
-        Speed = 153;
-        break;
-      }
-      case '3': {
-        Speed = 165;
-        break;
-      }
-      case '4': {
-        Speed = 178;
-        break;
-      }
-      case '5': {
-        Speed = 191;
-        break;
-      }
-      case '6': {
-        Speed = 204;
-        break;
-      }
-      case '7': {
-        Speed = 216;
-        break;
-      }
-      case '8': {
-        Speed = 229;
-        break;
-      }
-      case '9': {
-        Speed = 242;
-        break;
-      }
-      case 'q': {
-        Speed = 255;
-        break;
-      }
+     
+      
+      
     }
 
     Speedsec = Turnradius;
