@@ -175,10 +175,7 @@ void brakeOn() {
   }
 }
 
-   void brakeOff() {
-  // Release the electronic brake
-    Stop();
-}
+
   
     // save the current state as the last state,
     // for next time through the loop
