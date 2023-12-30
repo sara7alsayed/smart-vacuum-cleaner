@@ -1,5 +1,3 @@
-# smart vacuum cleaner
- smart vacuum cleaner
 #include <Servo.h>
 
 Servo Myservo;
@@ -10,17 +8,14 @@ Servo Myservo;
 #define MLb 5               // left motor 2nd pin
 #define MRa 6               // right motor 1st pin
 #define MRb 7               // right motor 2nd pin
-#define LED 13
-int Speed = 204;            // 0 - 255.
-int Speedsec;
-int Turnradius = 0;          // Set the radius of a turn, 0 - 255
+
+
 int brakeTime = 45;
 int brkonoff = 1;           // 1 for the electronic braking system, 0 for normal.
 
-#define in1 7                // L298n Motor Driver pins.
-#define in2 6
-#define in3 5
-#define in4 4
+void brakeOff(void);
+void brakeOn(void);
+
 
 int command;                // Int to store app command state.
 int buttonState = 0;
@@ -36,49 +31,45 @@ void setup() {
   pinMode(echoPin, INPUT);    // Set Echo Pin As I/P To Receive Reflected Waves
   Myservo.attach(10);
 
-  pinMode(in1, OUTPUT);
-  pinMode(in2, OUTPUT);
-  pinMode(in3, OUTPUT);
-  pinMode(in4, OUTPUT);
-  pinMode(LED, OUTPUT);        // Set the LED pin.
-  Serial.begin(9600);         // Set the baud rate to your Bluetooth module.
+   Serial.begin(9600);         // Set the baud rate to your Bluetooth module.
 }
 
 void loop() {
   // Check for Bluetooth command
-  if (Serial.available() > 0) {
+  if (Serial.available() > 0)
+  {
     command = Serial.read();
     Stop(); // Initialize with motors stopped.
 
     switch (command) {
-      case 'F': {
+      case 'F':
         forward();
         break;
-      }
-      case 'B': {
+      case 'B':
         back();
         break;
-      }
-      case 'L': {
+      case 'L':
         left();
         break;
-      }
-      case 'R': {
+      case 'R':
         right();
         break;
-      }
-     
-      
-      
-    }
+      case 'S':
+        Stop();
+        break;
+         }
 
-    Speedsec = Turnradius;
-    if (brkonoff == 1) {
+    if (brkonoff == 1) 
+    {
       brakeOn();
-    } else {
+    } 
+    else 
+    {
       brakeOff();
     }
-  } else {
+  }
+  else
+  {
     // If no Bluetooth command, perform obstacle avoidance
     obstacleAvoidance();
   }
@@ -95,19 +86,17 @@ void obstacleAvoidance() {
   Serial.println(distance);
   delay(10);
 
-  if (distance > 40) {
+  if (distance > 40) 
+  {
     // No obstacle, move forward
     Myservo.write(90);
-    digitalWrite(MRb, HIGH);       // Move Forward
-    digitalWrite(MRa, LOW);
-    digitalWrite(MLb, HIGH);
-    digitalWrite(MLa, LOW);
-  } else {
+    forward();
+  } 
+  
+  else
+  {
     // Obstacle detected, perform avoidance behavior
-    digitalWrite(MRb, LOW);        // Stop
-    digitalWrite(MRa, LOW);
-    digitalWrite(MLb, LOW);
-    digitalWrite(MLa, LOW);
+     Stop();
     delay(100);
 
     Myservo.write(0);
@@ -117,71 +106,52 @@ void obstacleAvoidance() {
     Myservo.write(90);
     delay(500);
 
-    digitalWrite(MRb, LOW);        // Move Backward
-    digitalWrite(MRa, HIGH);
-    digitalWrite(MLb, LOW);
-    digitalWrite(MLa, HIGH);
+    back();
     delay(500);
 
-    digitalWrite(MRb, LOW);        // Stop
-    digitalWrite(MRa, LOW);
-    digitalWrite(MLb, LOW);
-    digitalWrite(MLa, LOW);
+    Stop();
     delay(100);
 
-    digitalWrite(MRb, HIGH);       // Move Left
-    digitalWrite(MRa, LOW);
-    digitalWrite(MLa, LOW);
-    digitalWrite(MLb, LOW);
+    left();
     delay(500);
   }
 }
 
 void forward() {
-  analogWrite(in1, Speed);
-  analogWrite(in3, Speed);
+    analogWrite(MRb, 200);       // Move Forward
+    analogWrite(MRa, 0);
+    analogWrite(MLb, 200);
+    analogWrite(MLa, 0);
 }
 
 void back() {
-  analogWrite(in2, Speed);
-  analogWrite(in4, Speed);
+    analogWrite(MRb, 0);        // Move Backward
+    analogWrite(MRa, 200);
+    analogWrite(MLb, 0);
+    analogWrite(MLa, 200);
 }
 
 void left() {
-  analogWrite(in3, Speed);
-  analogWrite(in2, Speed);
+    analogWrite(MRb, 200);       // Move Left
+    analogWrite(MRa, 0);
+    analogWrite(MLb, 0);
+    analogWrite(MLa, 0);
 }
 
 void right() {
-  analogWrite(in4, Speed);
-  analogWrite(in1, Speed);
+    analogWrite(MRb, 0);       // Move right
+    analogWrite(MRa, 0);
+    analogWrite(MLb, 200);
+    analogWrite(MLa, 0);
 }
 
-void forwardleft() {
-  analogWrite(in1, Speedsec);
-  analogWrite(in3, Speed);
-}
 
-void forwardright() {
-  analogWrite(in1, Speed);
-  analogWrite(in3, Speedsec);
-}
-
-void backright() {
-  analogWrite(in2, Speed);
-  analogWrite(in4, Speedsec);
-}
-
-void backleft() {
-  analogWrite(in2, Speedsec);
-  analogWrite(in4, Speed);
-}
 
 void Stop() {
-  analogWrite(in1, 0);
-  analogWrite(in2, 0);
-  analogWrite(in3, 0);
-  analogWrite(in4, 0);
+    analogWrite(MRb, 0);       // Stop
+    analogWrite(MRa, 0);
+    analogWrite(MLa, 0);
+    analogWrite(MLb, 0);
 }
 
 void brakeOn() {
@@ -193,23 +163,22 @@ void brakeOn() {
     // if the state has changed, increment the counter
     if (buttonState == 'S') {
       if (lastButtonState != buttonState) {
-        digitalWrite(in1, HIGH);
-        digitalWrite(in2, HIGH);
-        digitalWrite(in3, HIGH);
-        digitalWrite(in4, HIGH);
+        analogWrite(MRb, 200);
+        analogWrite(MRa, 200);
+        analogWrite(MLa, 200);
+        analogWrite(MLb, 200);
         delay(brakeTime);
         Stop();
       }
     }
-    // save the current state as the last state,
-    // for next time through the loop
     lastButtonState = buttonState;
   }
 }
-void brakeOff() {
+
+   void brakeOff() {
   // Release the electronic brake
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, LOW);
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, LOW);
+    Stop();
 }
+  
+    // save the current state as the last state,
+    // for next time through the loop
